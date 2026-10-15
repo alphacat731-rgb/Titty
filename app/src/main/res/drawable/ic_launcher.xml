@@ -1,15 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp"
-    android:height="108dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
-    <path android:fillColor="#101216" android:pathData="M0,0h108v108h-108z" />
-    <path android:fillColor="#B7FF00"
-        android:pathData="M22,39 L14,15 L39,27 C48,22 60,22 69,27 L94,15 L86,39 C96,48 97,62 91,74 C84,88 70,94 54,94 C38,94 24,88 17,74 C11,62 12,48 22,39 Z" />
-    <path android:fillColor="#101216" android:pathData="M32,51a5,6 0,1 0,10 0a5,6 0,1 0,-10 0" />
-    <path android:fillColor="#101216" android:pathData="M66,51a5,6 0,1 0,10 0a5,6 0,1 0,-10 0" />
-    <path android:fillColor="#101216" android:pathData="M49,64 L54,68 L59,64 L54,61 Z" />
-    <path android:strokeColor="#101216" android:strokeWidth="2.5" android:strokeLineCap="round"
-        android:pathData="M54,68 L54,73 M54,71 C49,76 44,75 41,71 M54,71 C59,76 64,75 67,71" />
-</vector>
+<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
+    android:src="@drawable/titty_icon"
+    android:gravity="fill" />
