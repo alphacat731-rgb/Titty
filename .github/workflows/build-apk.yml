@@ -38,8 +38,8 @@ jobs:
       - name: Validate build inputs
         shell: bash
         env:
-          GAME_URL_INPUT: DOLLAR{{ inputs.game_url }}
-          APP_NAME_INPUT: DOLLAR{{ inputs.app_name }}
+          GAME_URL_INPUT: ${{ inputs.game_url }}
+          APP_NAME_INPUT: ${{ inputs.app_name }}
         run: |
           python3 - <<'PY'
           import os, re
