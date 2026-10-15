@@ -12,7 +12,22 @@ on:
         description: "Name shown under the app icon (letters, numbers, spaces, . _ -)"
         required: true
         type: string
-        default: "Pocket Game"
+        default: "Titty"
+      minimum_android:
+        description: "Oldest Android release the APK should target for installation"
+        required: true
+        type: choice
+        options:
+          - "Android 2.3.3–2.3.7 (API 10)"
+          - "Android 4.0 (API 14)"
+          - "Android 4.4 (API 19)"
+          - "Android 5.0 (API 21)"
+          - "Android 6.0 (API 23)"
+          - "Android 8.0 (API 26)"
+          - "Android 10 (API 29)"
+          - "Android 12 (API 31)"
+          - "Android 15 (API 35)"
+        default: "Android 6.0 (API 23)"
 
 permissions:
   contents: read
@@ -40,6 +55,7 @@ jobs:
         env:
           GAME_URL_INPUT: ${{ inputs.game_url }}
           APP_NAME_INPUT: ${{ inputs.app_name }}
+          MINIMUM_ANDROID_INPUT: ${{ inputs.minimum_android }}
         run: |
           python3 - <<'PY'
           import os, re
@@ -47,28 +63,48 @@ jobs:
 
           raw_url = os.environ.get("GAME_URL_INPUT", "").strip()
           app_name = os.environ.get("APP_NAME_INPUT", "").strip()
+          minimum_android = os.environ.get("MINIMUM_ANDROID_INPUT", "").strip()
           parsed = urlparse(raw_url)
           host = (parsed.hostname or "").lower().rstrip(".")
           allowed_hosts = {"scratch.mit.edu", "www.scratch.mit.edu", "turbowarp.org", "www.turbowarp.org"}
+          is_itch = (
+              host == "itch.io" or host.endswith(".itch.io")
+              or host == "itch.zone" or host.endswith(".itch.zone")
+          )
+          api_by_release = {
+              "Android 2.3.3–2.3.7 (API 10)": 10,
+              "Android 4.0 (API 14)": 14,
+              "Android 4.4 (API 19)": 19,
+              "Android 5.0 (API 21)": 21,
+              "Android 6.0 (API 23)": 23,
+              "Android 8.0 (API 26)": 26,
+              "Android 10 (API 29)": 29,
+              "Android 12 (API 31)": 31,
+              "Android 15 (API 35)": 35,
+          }
 
           if not raw_url or any(c in raw_url for c in "\r\n"):
               raise SystemExit("Invalid URL: provide one HTTPS URL.")
-          if parsed.scheme != "https" or not (host in allowed_hosts or host == "itch.io" or host.endswith(".itch.io") or host == "itch.zone" or host.endswith(".itch.zone")):
+          if parsed.scheme != "https" or not (host in allowed_hosts or is_itch):
               raise SystemExit("URL rejected. Use HTTPS on Scratch, TurboWarp, itch.io, or itch.zone.")
           if parsed.username or parsed.password or (parsed.port not in (None, 443)):
               raise SystemExit("URL rejected: credentials and custom ports are not allowed.")
           if not re.fullmatch(r"[A-Za-z0-9 _.-]{1,30}", app_name):
               raise SystemExit("App name must be 1-30 characters: letters, numbers, spaces, dots, underscores or hyphens.")
+          if minimum_android not in api_by_release:
+              raise SystemExit("Unknown minimum Android version selection.")
 
           with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env:
               env.write(f"GAME_URL={raw_url}\n")
               env.write(f"APP_NAME={app_name}\n")
+              env.write(f"MIN_ANDROID_API={api_by_release[minimum_android]}\n")
 
-          print("Inputs valid. Building " + app_name + " for " + host + ".")
+          print("Inputs valid. Minimum Android API: " + str(api_by_release[minimum_android]))
+          print("Building " + app_name + " for " + host + ".")
           PY
 
       - name: Build debug APK
-        run: gradle --no-daemon assembleDebug -PGAME_URL="$GAME_URL" -PAPP_NAME="$APP_NAME"
+        run: gradle --no-daemon assembleDebug -PGAME_URL="$GAME_URL" -PAPP_NAME="$APP_NAME" -PMIN_ANDROID_API="$MIN_ANDROID_API"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
