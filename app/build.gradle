@@ -17,7 +17,7 @@ android {
         versionCode 1
         versionName "1.0"
         manifestPlaceholders = [appName: appName]
-        buildConfigField "String", "START_URL", "\"\${escapedGameUrl}\""
+        buildConfigField "String", "START_URL", "\"${escapedGameUrl}\""
     }
 
     buildFeatures {
