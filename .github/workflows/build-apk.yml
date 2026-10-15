@@ -38,8 +38,8 @@ jobs:
       - name: Validate build inputs
         shell: bash
         env:
-          GAME_URL_INPUT: \${{ inputs.game_url }}
-          APP_NAME_INPUT: \${{ inputs.app_name }}
+          GAME_URL_INPUT: DOLLAR{{ inputs.game_url }}
+          APP_NAME_INPUT: DOLLAR{{ inputs.app_name }}
         run: |
           python3 - <<'PY'
           import os, re
@@ -50,7 +50,7 @@ jobs:
           parsed = urlparse(raw_url)
           allowed = {"scratch.mit.edu", "www.scratch.mit.edu", "turbowarp.org", "www.turbowarp.org"}
 
-          if not raw_url or any(c in raw_url for c in "\\r\\n"):
+          if not raw_url or any(c in raw_url for c in "\r\n"):
               raise SystemExit("Invalid URL: provide one HTTPS URL.")
           if parsed.scheme != "https" or parsed.hostname is None or parsed.hostname.lower().rstrip(".") not in allowed:
               raise SystemExit("URL rejected. Use HTTPS on scratch.mit.edu or turbowarp.org.")
@@ -60,8 +60,8 @@ jobs:
               raise SystemExit("App name must be 1-30 characters: letters, numbers, spaces, dots, underscores or hyphens.")
 
           with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env:
-              env.write(f"GAME_URL={raw_url}\\n")
-              env.write(f"APP_NAME={app_name}\\n")
+              env.write(f"GAME_URL={raw_url}\n")
+              env.write(f"APP_NAME={app_name}\n")
 
           print("Inputs valid. Building " + app_name + " for " + parsed.hostname + ".")
 
