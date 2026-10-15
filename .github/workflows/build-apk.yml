@@ -4,15 +4,15 @@ on:
   workflow_dispatch:
     inputs:
       game_url:
-        description: "HTTPS URL on Scratch, TurboWarp, itch.io or itch.zone"
+        description: "HTTPS URL on scratch.mit.edu or turbowarp.org"
         required: true
         type: string
-        default: "https://html-classic.itch.zone/html/19623876/index.html?v=1791405969"
+        default: "https://turbowarp.org/"
       app_name:
         description: "Name shown under the app icon (letters, numbers, spaces, . _ -)"
         required: true
         type: string
-        default: "Titty Typers"
+        default: "Pocket Game"
 
 permissions:
   contents: read
@@ -49,16 +49,12 @@ jobs:
           app_name = os.environ.get("APP_NAME_INPUT", "").strip()
           parsed = urlparse(raw_url)
           host = (parsed.hostname or "").lower().rstrip(".")
-          basic_hosts = {"scratch.mit.edu", "www.scratch.mit.edu", "turbowarp.org", "www.turbowarp.org"}
-          is_itch = (
-              host == "itch.io" or host.endswith(".itch.io")
-              or host == "itch.zone" or host.endswith(".itch.zone")
-          )
+          allowed_hosts = {"scratch.mit.edu", "www.scratch.mit.edu", "turbowarp.org", "www.turbowarp.org"}
 
           if not raw_url or any(c in raw_url for c in "\r\n"):
               raise SystemExit("Invalid URL: provide one HTTPS URL.")
-          if parsed.scheme != "https" or not host or not (host in basic_hosts or is_itch):
-              raise SystemExit("URL rejected. Use HTTPS on scratch.mit.edu, turbowarp.org, itch.io or itch.zone.")
+          if parsed.scheme != "https" or host not in allowed_hosts:
+              raise SystemExit("URL rejected. Use HTTPS on scratch.mit.edu or turbowarp.org.")
           if parsed.username or parsed.password or (parsed.port not in (None, 443)):
               raise SystemExit("URL rejected: credentials and custom ports are not allowed.")
           if not re.fullmatch(r"[A-Za-z0-9 _.-]{1,30}", app_name):
