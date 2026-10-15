@@ -28,7 +28,13 @@ public class MainActivity extends Activity {
     private boolean isAllowed(Uri uri) {
         if (uri == null || !"https".equalsIgnoreCase(uri.getScheme())) return false;
         String host = uri.getHost();
-        return host != null && ALLOWED_HOSTS.contains(host.toLowerCase(java.util.Locale.ROOT));
+        if (host == null) return false;
+        String normalizedHost = host.toLowerCase(java.util.Locale.ROOT);
+        return ALLOWED_HOSTS.contains(normalizedHost)
+            || normalizedHost.equals("itch.io")
+            || normalizedHost.endsWith(".itch.io")
+            || normalizedHost.equals("itch.zone")
+            || normalizedHost.endsWith(".itch.zone");
     }
 
     private void hideSystemUi() {
