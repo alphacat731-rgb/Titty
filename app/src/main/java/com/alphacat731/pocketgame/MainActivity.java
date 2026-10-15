@@ -28,6 +28,17 @@ public class MainActivity extends Activity {
     private boolean isAllowed(Uri uri) {
         if (uri == null || !"https".equalsIgnoreCase(uri.getScheme())) return false;
         String host = uri.getHost();
+        if (host == null) return false;
+        host = host.toLowerCase(java.util.Locale.ROOT);
+        if (ALLOWED_HOSTS.contains(host)) return true;
+        return host.equals("itch.io") || host.endsWith(".itch.io")
+            || host.equals("itch.zone") || host.endsWith(".itch.zone");
+    }
+
+
+    private boolean isAllowed(Uri uri) {
+        if (uri == null || !"https".equalsIgnoreCase(uri.getScheme())) return false;
+        String host = uri.getHost();
         return host != null && ALLOWED_HOSTS.contains(host.toLowerCase(java.util.Locale.ROOT));
     }
 
