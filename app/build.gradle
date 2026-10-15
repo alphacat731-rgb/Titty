@@ -4,6 +4,7 @@ plugins {
 
 def gameUrl = providers.gradleProperty("GAME_URL").getOrElse("https://turbowarp.org/")
 def appName = providers.gradleProperty("APP_NAME").getOrElse("Pocket Game")
+def minAndroidApi = providers.gradleProperty("MIN_ANDROID_API").getOrElse("23").toInteger()
 def escapedGameUrl = gameUrl.replace("\\", "\\\\").replace('"', '\\"')
 
 android {
@@ -12,12 +13,12 @@ android {
 
     defaultConfig {
         applicationId "com.alphacat731.pocketgame"
-        minSdk 23
+        minSdk minAndroidApi
         targetSdk 35
         versionCode 1
         versionName "1.0"
         manifestPlaceholders = [appName: appName]
-        buildConfigField "String", "START_URL", "\"${escapedGameUrl}\""
+        buildConfigField "String", "START_URL", "\"\${escapedGameUrl}\""
     }
 
     buildFeatures {
