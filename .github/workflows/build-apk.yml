@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       game_url:
-        description: "HTTPS URL on scratch.mit.edu or turbowarp.org"
+        description: "HTTPS URL on Scratch, TurboWarp, itch.io or itch.zone"
         required: true
         type: string
         default: "https://turbowarp.org/"
@@ -12,7 +12,7 @@ on:
         description: "Name shown under the app icon (letters, numbers, spaces, . _ -)"
         required: true
         type: string
-        default: "Pocket Game"
+        default: "Titty Typers"
 
 permissions:
   contents: read
@@ -48,12 +48,17 @@ jobs:
           raw_url = os.environ.get("GAME_URL_INPUT", "").strip()
           app_name = os.environ.get("APP_NAME_INPUT", "").strip()
           parsed = urlparse(raw_url)
-          allowed = {"scratch.mit.edu", "www.scratch.mit.edu", "turbowarp.org", "www.turbowarp.org"}
+          host = (parsed.hostname or "").lower().rstrip(".")
+          basic_hosts = {"scratch.mit.edu", "www.scratch.mit.edu", "turbowarp.org", "www.turbowarp.org"}
+          is_itch = (
+              host == "itch.io" or host.endswith(".itch.io")
+              or host == "itch.zone" or host.endswith(".itch.zone")
+          )
 
           if not raw_url or any(c in raw_url for c in "\r\n"):
               raise SystemExit("Invalid URL: provide one HTTPS URL.")
-          if parsed.scheme != "https" or parsed.hostname is None or parsed.hostname.lower().rstrip(".") not in allowed:
-              raise SystemExit("URL rejected. Use HTTPS on scratch.mit.edu or turbowarp.org.")
+          if parsed.scheme != "https" or not host or not (host in basic_hosts or is_itch):
+              raise SystemExit("URL rejected. Use HTTPS on scratch.mit.edu, turbowarp.org, itch.io or itch.zone.")
           if parsed.username or parsed.password or (parsed.port not in (None, 443)):
               raise SystemExit("URL rejected: credentials and custom ports are not allowed.")
           if not re.fullmatch(r"[A-Za-z0-9 _.-]{1,30}", app_name):
@@ -63,7 +68,8 @@ jobs:
               env.write(f"GAME_URL={raw_url}\n")
               env.write(f"APP_NAME={app_name}\n")
 
-          print("Inputs valid. Building " + app_name + " for " + parsed.hostname + ".")
+          print("Inputs valid. Building " + app_name + " for " + host + ".")
+          PY
 
       - name: Build debug APK
         run: gradle --no-daemon assembleDebug -PGAME_URL="$GAME_URL" -PAPP_NAME="$APP_NAME"
