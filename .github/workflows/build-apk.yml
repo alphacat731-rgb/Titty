@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       game_url:
-        description: "HTTPS URL on scratch.mit.edu or turbowarp.org"
+        description: "HTTPS URL on Scratch, TurboWarp, or itch.io/itch.zone"
         required: true
         type: string
         default: "https://turbowarp.org/"
@@ -53,8 +53,8 @@ jobs:
 
           if not raw_url or any(c in raw_url for c in "\r\n"):
               raise SystemExit("Invalid URL: provide one HTTPS URL.")
-          if parsed.scheme != "https" or host not in allowed_hosts:
-              raise SystemExit("URL rejected. Use HTTPS on scratch.mit.edu or turbowarp.org.")
+          if parsed.scheme != "https" or not (host in allowed_hosts or host == "itch.io" or host.endswith(".itch.io") or host == "itch.zone" or host.endswith(".itch.zone")):
+              raise SystemExit("URL rejected. Use HTTPS on Scratch, TurboWarp, itch.io, or itch.zone.")
           if parsed.username or parsed.password or (parsed.port not in (None, 443)):
               raise SystemExit("URL rejected: credentials and custom ports are not allowed.")
           if not re.fullmatch(r"[A-Za-z0-9 _.-]{1,30}", app_name):
