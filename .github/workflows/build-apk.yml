@@ -7,7 +7,7 @@ on:
         description: "HTTPS URL on Scratch, TurboWarp, itch.io or itch.zone"
         required: true
         type: string
-        default: "https://turbowarp.org/"
+        default: "https://html-classic.itch.zone/html/19623876/index.html?v=1791405969"
       app_name:
         description: "Name shown under the app icon (letters, numbers, spaces, . _ -)"
         required: true
